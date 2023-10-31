@@ -6,8 +6,16 @@ const userController = {
   signUpPage: (req, res) => {
     res.render('signup')
   },
-  signUp: (req, res) => {
-    bcrypt.hash(req.body.password, 10)
+  signUp: (req, res, next) => {
+    // 當拋出一個Error時 js會自動跳出原本的function
+    if (req.body.password !== req.body.passwordCheck) throw new Error('Passwords do not match!')
+
+    User.findOne({ where: { email: req.body.email } })
+      .then(user => {
+        if (user) throw new Error('Email already exists!')
+
+        return bcrypt.hash(req.body.password, 10)
+      })
       .then(hash =>
         // User.create 加上前後{} 就需加上return 需要取用他的值 如沒有用{} 也是有用return只是省略而已
         User.create({
@@ -15,7 +23,12 @@ const userController = {
           email: req.body.email,
           password: hash
         }))
-      .then(() => res.redirect('/signin'))
+      .then(() => {
+        req.flash('success', '註冊成功!')
+        res.redirect('/signin')
+      })
+      // 傳遞給Express內建的 Error Handler
+      .catch(error => next(error))
   }
 }
 
