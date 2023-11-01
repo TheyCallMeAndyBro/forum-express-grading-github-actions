@@ -29,6 +29,18 @@ const userController = {
       })
       // 傳遞給Express內建的 Error Handler
       .catch(error => next(error))
+  },
+  signInPage: (req, res) => {
+    res.render('signin')
+  },
+  signIn: (req, res) => {
+    req.flash('success', '登入成功')
+    res.redirect('/restaurants')
+  },
+  logout: (req, res) => {
+    req.flash('success', '登出成功')
+    req.logout() // passport 提供的功能 => 刪除這個id對應的session清除掉 => 登出
+    res.redirect('/signin')
   }
 }
 
