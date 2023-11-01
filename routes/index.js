@@ -5,6 +5,8 @@ const admin = require('./modules/admin')
 const restController = require('../controllers/restaurant-controller')
 const userController = require('../controllers/user-controller')
 
+const { authenticated } = require('../middlewares/auth')
+
 router.use('/admin', admin)
 
 router.get('/signup', userController.signUpPage)
@@ -16,7 +18,7 @@ router.post('/signin', passport.authenticate('local', {
   failureFlash: true
 }), userController.signIn)
 
-router.get('/restaurants', restController.getRestaurants)
+router.get('/restaurants', authenticated, restController.getRestaurants)
 router.get('/', (req, res) => res.redirect('/restaurants')) // 設定 fallback路由 如都匹配不到就會執行這行  如果想甚麼都沒匹配到然後導入/restaurants 把get 更改成 use
 
 module.exports = router
