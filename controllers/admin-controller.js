@@ -21,6 +21,17 @@ const adminController = {
         res.redirect('/admin/restaurants') // 新增完成後導回後台首頁
       })
       .catch(err => next(err))
+  },
+  getRestaurant: (req, res, next) => {
+    Restaurant.findByPk(req.params.id, {
+      raw: true
+    })
+      .then(restaurant => {
+        if (!restaurant) throw new Error('Restaurant did not exist!')
+
+        res.render('admin/restaurant', { restaurant })
+      })
+      .catch(err => next(err))
   }
 
 }
