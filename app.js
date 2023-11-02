@@ -1,3 +1,4 @@
+const path = require('path')
 const express = require('express')
 const handlebars = require('express-handlebars')
 const flash = require('connect-flash')
@@ -23,6 +24,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }))
 app.use(flash()) // flash這種功能存在 session裡
 app.use(methodOverride('_method')) // _method為自定義
+app.use('/upload', express.static(path.join(__dirname, 'upload'))) // 以/upload開頭的才被允許訪問 而__dirname/upload 被設為根目錄
+
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(generalPartialsHandler)

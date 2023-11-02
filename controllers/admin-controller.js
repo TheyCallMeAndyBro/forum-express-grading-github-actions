@@ -1,4 +1,5 @@
 const { Restaurant } = require('../models')
+const { localFileHandler } = require('../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
@@ -15,7 +16,13 @@ const adminController = {
     const { name, tel, address, openingHours, description } = req.body
     if (!name) throw new Error('Restaurant name is required !')
 
-    Restaurant.create({ name, tel, address, openingHours, description })
+    const { file } = req // 這邊要獲取的是req中file這個檔案 而req.body.file 獲取的是 name=file 輸入的字串
+
+    localFileHandler(file) // 傳入req獲取的file 有無檔案邏輯已在helpers內做完
+      .then(filePath => { // filePath為最後resolve的`/${fileName}`路徑字符串
+        return Restaurant.create({ name, tel, address, openingHours, description, image: filePath || null })
+      })
+
       .then(() => {
         req.flash('success', 'restaurant was successfully created') // 在畫面顯示成功提示
         res.redirect('/admin/restaurants') // 新增完成後導回後台首頁
@@ -48,12 +55,21 @@ const adminController = {
     const { name, tel, address, openingHours, description } = req.body
     if (!name) throw new Error('Restaurant name is required !')
 
-    Restaurant.findByPk(req.params.id)
-      .then(restaurant => {
+    const { file } = req // 這邊要獲取的是req中file這個檔案 而req.body.file 獲取的是 name=file 輸入的字串
+
+    // 傳入req獲取的file 有無檔案邏輯已在helpers內做完
+    // Promise.all([a.b]) Promise.all會把參數a,b做完 .then會收到a.b的結果 在執行 .then([a,b])
+    Promise.all([
+      Restaurant.findByPk(req.params.id),
+      localFileHandler(file)
+    ])
+      .then(([restaurant, filePath]) => {
         if (!restaurant) throw new Error('Restaurant did not exist!')
         // 也可用Restaurant.update寫法 裡面多添加where 就好
-        return restaurant.update({ name, tel, address, openingHours, description })
+        // image: filePath || restaurant.image 如果有編輯照片 就用新的 沒有用舊的
+        return restaurant.update({ name, tel, address, openingHours, description, image: filePath || restaurant.image })
       })
+
       .then(() => {
         req.flash('success', 'Update successfully!')
         res.redirect('/admin/restaurants')
