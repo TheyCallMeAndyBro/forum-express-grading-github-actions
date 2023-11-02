@@ -5,9 +5,9 @@ const admin = require('./modules/admin')
 const restController = require('../controllers/restaurant-controller')
 const userController = require('../controllers/user-controller')
 
-const { authenticated } = require('../middlewares/auth')
+const { authenticated, authenticatedAdmin } = require('../middlewares/auth')
 
-router.use('/admin', admin)
+router.use('/admin', authenticatedAdmin, admin) // 檢查admin權限
 
 router.get('/signup', userController.signUpPage)
 router.post('/signup', userController.signUp)
