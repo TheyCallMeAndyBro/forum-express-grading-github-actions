@@ -55,7 +55,20 @@ const adminController = {
         return restaurant.update({ name, tel, address, openingHours, description })
       })
       .then(() => {
-        req.flash('success', 'update successfully !')
+        req.flash('success', 'Update successfully!')
+        res.redirect('/admin/restaurants')
+      })
+      .catch(err => next(err))
+  },
+  deleteRestaurant: (req, res, next) => {
+    Restaurant.findByPk(req.params.id)
+      .then(restaurant => {
+        if (!restaurant) throw new Error('Restaurant did not exist!')
+        // 也可用Restaurant.update寫法 裡面多添加where 就好
+        return restaurant.destroy()
+      })
+      .then(() => {
+        req.flash('success', 'Delete successfully!')
         res.redirect('/admin/restaurants')
       })
       .catch(err => next(err))

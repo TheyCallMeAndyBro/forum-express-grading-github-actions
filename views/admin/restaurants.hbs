@@ -29,7 +29,10 @@
           </a>
         </button>
         <form action="/admin/restaurants/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
-          <button type="submit" class="btn btn-link link-danger">Delete</button>
+          <button type="submit" class="btn btn-link link-danger"
+            onclick="return confirm(`確定要刪除 {{ this.name }} 嗎？`)">Delete
+            {{!-- confirm 跳出確定或取消 回傳true/false return回傳這個值給onclick 再看是否要執行此次submit事件 --}}
+            </button>
         </form>
       </td>
     </tr>
