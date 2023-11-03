@@ -4,7 +4,7 @@ const { localFileHandler } = require('../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
-    Restaurant.findAll({
+    return Restaurant.findAll({
       raw: true
     })
       .then(restaurants => res.render('admin/restaurants', { restaurants }))
@@ -31,7 +31,7 @@ const adminController = {
       .catch(err => next(err))
   },
   getRestaurant: (req, res, next) => {
-    Restaurant.findByPk(req.params.id, {
+    return Restaurant.findByPk(req.params.id, {
       raw: true
     })
       .then(restaurant => {
@@ -42,7 +42,7 @@ const adminController = {
       .catch(err => next(err))
   },
   editRestaurant: (req, res, next) => {
-    Restaurant.findByPk(req.params.id, {
+    return Restaurant.findByPk(req.params.id, {
       raw: true
     })
       .then(restaurant => {
@@ -60,7 +60,7 @@ const adminController = {
 
     // 傳入req獲取的file 有無檔案邏輯已在helpers內做完
     // Promise.all([a.b]) Promise.all會把參數a,b做完 .then會收到a.b的結果 在執行 .then([a,b])
-    Promise.all([
+    return Promise.all([
       Restaurant.findByPk(req.params.id),
       localFileHandler(file)
     ])
@@ -78,7 +78,7 @@ const adminController = {
       .catch(err => next(err))
   },
   deleteRestaurant: (req, res, next) => {
-    Restaurant.findByPk(req.params.id)
+    return Restaurant.findByPk(req.params.id)
       .then(restaurant => {
         if (!restaurant) throw new Error('Restaurant did not exist!')
         // 也可用Restaurant.update寫法 裡面多添加where 就好
@@ -91,7 +91,7 @@ const adminController = {
       .catch(err => next(err))
   },
   getUsers: (req, res) => {
-    User.findAll({
+    return User.findAll({
       raw: true
     })
       .then(users => res.render('admin/users', { users }))
