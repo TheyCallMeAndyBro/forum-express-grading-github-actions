@@ -1,9 +1,9 @@
-const { Restaurant } = require('../models')
+const { Restaurant, User } = require('../models')
 const { localFileHandler } = require('../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
-    Restaurant.findAll({
+    return Restaurant.findAll({
       raw: true
     })
       .then(restaurants => res.render('admin/restaurants', { restaurants }))
@@ -24,13 +24,13 @@ const adminController = {
       })
 
       .then(() => {
-        req.flash('success', 'restaurant was successfully created') // 在畫面顯示成功提示
+        req.flash('success_messages', 'restaurant was successfully created') // 在畫面顯示成功提示
         res.redirect('/admin/restaurants') // 新增完成後導回後台首頁
       })
       .catch(err => next(err))
   },
   getRestaurant: (req, res, next) => {
-    Restaurant.findByPk(req.params.id, {
+    return Restaurant.findByPk(req.params.id, {
       raw: true
     })
       .then(restaurant => {
@@ -41,7 +41,7 @@ const adminController = {
       .catch(err => next(err))
   },
   editRestaurant: (req, res, next) => {
-    Restaurant.findByPk(req.params.id, {
+    return Restaurant.findByPk(req.params.id, {
       raw: true
     })
       .then(restaurant => {
@@ -59,7 +59,7 @@ const adminController = {
 
     // 傳入req獲取的file 有無檔案邏輯已在helpers內做完
     // Promise.all([a.b]) Promise.all會把參數a,b做完 .then會收到a.b的結果 在執行 .then([a,b])
-    Promise.all([
+    return Promise.all([
       Restaurant.findByPk(req.params.id),
       localFileHandler(file)
     ])
@@ -71,21 +71,46 @@ const adminController = {
       })
 
       .then(() => {
-        req.flash('success', 'Update successfully!')
+        req.flash('success_messages', 'Update successfully!')
         res.redirect('/admin/restaurants')
       })
       .catch(err => next(err))
   },
   deleteRestaurant: (req, res, next) => {
-    Restaurant.findByPk(req.params.id)
+    return Restaurant.findByPk(req.params.id)
       .then(restaurant => {
         if (!restaurant) throw new Error('Restaurant did not exist!')
         // 也可用Restaurant.update寫法 裡面多添加where 就好
         return restaurant.destroy()
       })
       .then(() => {
-        req.flash('success', 'Delete successfully!')
+        req.flash('success_messages', 'Delete successfully!')
         res.redirect('/admin/restaurants')
+      })
+      .catch(err => next(err))
+  },
+  getUsers: (req, res, next) => {
+    return User.findAll({
+      raw: true
+    })
+      .then(users => res.render('admin/users', { users }))
+      .catch(err => next(err))
+  },
+  patchUser: (req, res, next) => {
+    return User.findByPk(req.params.id)
+      .then(user => {
+        if (!user) throw new Error('User did not exist!')
+        if (user.email === 'root@example.com') {
+          req.flash('error_messages', '禁止變更 root 權限')
+          return res.redirect('back')
+        }
+        return user.update({
+          isAdmin: !user.isAdmin
+        })
+      })
+      .then(() => {
+        req.flash('success_messages', '使用者權限變更成功')
+        return res.redirect('/admin/users')
       })
       .catch(err => next(err))
   }
