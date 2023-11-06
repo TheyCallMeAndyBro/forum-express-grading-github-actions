@@ -1,11 +1,12 @@
-const { Restaurant } = require('../models')
-const { User } = require('../models')
+const { Restaurant, User, Category } = require('../models')
 const { localFileHandler } = require('../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
     return Restaurant.findAll({
-      raw: true
+      raw: true,
+      nest: true, // 讓他從 Restaurant[Category.id] => Restaurant.Category.id 比較好理解
+      include: [Category] // 包含Category的資料
     })
       .then(restaurants => res.render('admin/restaurants', { restaurants }))
       .catch(err => next(err))
@@ -32,12 +33,14 @@ const adminController = {
   },
   getRestaurant: (req, res, next) => {
     return Restaurant.findByPk(req.params.id, {
-      raw: true
+      raw: true,
+      nest: true,
+      include: [Category]
     })
       .then(restaurant => {
         if (!restaurant) throw new Error('Restaurant did not exist!')
-
         res.render('admin/restaurant', { restaurant })
+        // 在只有單筆資料時候 可以使用 { restaurant: restaurant.toJSON() } 取代  raw: true, nest: true,
       })
       .catch(err => next(err))
   },
