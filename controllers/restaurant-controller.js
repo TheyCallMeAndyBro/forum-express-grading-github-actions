@@ -37,6 +37,6 @@ const restaurantController = {
         res.render('dashboard', { restaurant })
       })
       .catch(err => next(err))
-
   }
+}
 module.exports = restaurantController
