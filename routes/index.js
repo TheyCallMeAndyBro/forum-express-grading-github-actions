@@ -19,11 +19,14 @@ router.post('/signin', passport.authenticate('local', {
   failureFlash: true
 }), userController.signIn)
 
+router.get('/logout', userController.logout)
+
 router.get('/restaurants', authenticated, restController.getRestaurants)
 router.get('/restaurants/:id/dashboard', authenticated, restController.getDashboard)
 router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/', (req, res) => res.redirect('/restaurants')) // 設定 fallback路由 如都匹配不到就會執行這行  如果想甚麼都沒匹配到然後導入/restaurants 把get 更改成 use
 
+router.delete('/comments/:id', authenticated, commentController.deleteComment)
 router.post('/comments', authenticated, commentController.postComment)
 
 module.exports = router
