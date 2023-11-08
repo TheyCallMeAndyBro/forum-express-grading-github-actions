@@ -1,4 +1,4 @@
-const { User } = require('../models')
+const { User, Comment, Restaurant } = require('../models')
 const bcrypt = require('bcryptjs')
 const { localFileHandler } = require('../helpers/file-helpers')
 
@@ -43,20 +43,31 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: (req, res, next) => {
-    return User.findByPk(req.params.id, { raw: true })
-      .then(user => res.render('user/profile', { user }))
+    return User.findByPk(req.params.id, {
+      include: [{
+        model: Comment, include: Restaurant
+      }]
+    })
+      .then(user => {
+        if (!user) throw new Error('User did not exist!')
+
+        user = user.toJSON()
+
+        const userCommentRestaurant = user.Comments ? user.Comments : []
+
+        res.render('users/profile', { user, userCommentRestaurant })
+      })
       .catch(err => next(err))
   },
   editUser: (req, res, next) => {
     return User.findByPk(req.params.id, { raw: true })
-      .then(user => res.render('user/edit', { user }))
+      .then(user => res.render('users/edit', { user }))
       .catch(err => next(err))
   },
   putUser: (req, res, next) => {
     const { name } = req.body
     const { file } = req
-    console.log(req.body)
-    console.log(req)
+
     if (!name) throw new Error('Name is required!')
 
     return Promise.all([
@@ -69,7 +80,7 @@ const userController = {
         return user.update({ name, image: filePath || user.image })
       })
       .then(() => {
-        req.flash('success_messages', 'Update successfully!')
+        req.flash('success_messages', '使用者資料編輯成功')
         res.redirect(`/users/${req.params.id}`)
       })
       .catch(err => next(err))
