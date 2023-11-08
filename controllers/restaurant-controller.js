@@ -44,7 +44,8 @@ const restaurantController = {
         Category,
         { model: Comment, include: User }
         // 先找 Category 再找 Comment 再利用 Comment 關係找 User 使用User資料就變成Restaurant.Comment.User.id
-      ]
+      ],
+      order: [[Comment, 'createdAt', 'DESC']]
     })
       .then(restaurant => {
         if (!restaurant) throw new Error("Restaurant didn't exist!")
