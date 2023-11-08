@@ -1,4 +1,4 @@
-const { User } = require('../models')
+const { User, Comment, Restaurant } = require('../models')
 const bcrypt = require('bcryptjs')
 const { localFileHandler } = require('../helpers/file-helpers')
 
@@ -43,8 +43,20 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: (req, res, next) => {
-    return User.findByPk(req.params.id, { raw: true })
-      .then(user => res.render('user/profile', { user }))
+    return User.findByPk(req.params.id, {
+      include: [{
+        model: Comment, include: Restaurant
+      }]
+    })
+      .then(user => {
+        if (!user) throw new Error('User did not exist!')
+
+        user = user.toJSON()
+
+        const userCommentRestaurant = user.Comments ? user.Comments : []
+
+        res.render('user/profile', { user, userCommentRestaurant })
+      })
       .catch(err => next(err))
   },
   editUser: (req, res, next) => {
@@ -55,8 +67,7 @@ const userController = {
   putUser: (req, res, next) => {
     const { name } = req.body
     const { file } = req
-    console.log(req.body)
-    console.log(req)
+
     if (!name) throw new Error('Name is required!')
 
     return Promise.all([
