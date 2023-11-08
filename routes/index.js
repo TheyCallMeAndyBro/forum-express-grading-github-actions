@@ -8,6 +8,8 @@ const commentController = require('../controllers/comment-controller')
 
 const { authenticated, authenticatedAdmin } = require('../middlewares/auth')
 
+const upload = require('../middlewares/multer')
+
 router.use('/admin', authenticatedAdmin, admin) // 檢查admin權限
 
 router.get('/signup', userController.signUpPage)
@@ -20,6 +22,10 @@ router.post('/signin', passport.authenticate('local', {
 }), userController.signIn)
 
 router.get('/logout', userController.logout)
+
+router.get('/users/:id', authenticated, userController.getUser)
+router.get('/users/:id/edit', authenticated, userController.editUser)
+router.put('/users/:id', authenticated, upload.single('image'), userController.putUser)
 
 router.get('/restaurants', authenticated, restController.getRestaurants)
 router.get('/restaurants/:id/dashboard', authenticated, restController.getDashboard)

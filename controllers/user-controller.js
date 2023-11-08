@@ -1,6 +1,6 @@
-const db = require('../models')
-const { User } = db
+const { User } = require('../models')
 const bcrypt = require('bcryptjs')
+const { localFileHandler } = require('../helpers/file-helpers')
 
 const userController = {
   signUpPage: (req, res) => {
@@ -41,7 +41,40 @@ const userController = {
     req.flash('success_messages', '登出成功')
     req.logout() // passport 提供的功能 => 刪除這個id對應的session清除掉 => 登出
     res.redirect('/signin')
+  },
+  getUser: (req, res, next) => {
+    return User.findByPk(req.params.id, { raw: true })
+      .then(user => res.render('user/profile', { user }))
+      .catch(err => next(err))
+  },
+  editUser: (req, res, next) => {
+    return User.findByPk(req.params.id, { raw: true })
+      .then(user => res.render('user/edit', { user }))
+      .catch(err => next(err))
+  },
+  putUser: (req, res, next) => {
+    const { name } = req.body
+    const { file } = req
+    console.log(req.body)
+    console.log(req)
+    if (!name) throw new Error('Name is required!')
+
+    return Promise.all([
+      User.findByPk(req.params.id),
+      localFileHandler(file)
+    ])
+      .then(([user, filePath]) => {
+        if (!user) throw new Error('User is not exist!')
+
+        return user.update({ name, image: filePath || user.image })
+      })
+      .then(() => {
+        req.flash('success_messages', 'Update successfully!')
+        res.redirect(`/users/${req.params.id}`)
+      })
+      .catch(err => next(err))
   }
+
 }
 
 module.exports = userController
