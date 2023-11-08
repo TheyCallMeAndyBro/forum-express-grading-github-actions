@@ -4,6 +4,7 @@ const passport = require('../config/passport')
 const admin = require('./modules/admin')
 const restController = require('../controllers/restaurant-controller')
 const userController = require('../controllers/user-controller')
+const commentController = require('../controllers/comment-controller')
 
 const { authenticated, authenticatedAdmin } = require('../middlewares/auth')
 
@@ -22,5 +23,7 @@ router.get('/restaurants', authenticated, restController.getRestaurants)
 router.get('/restaurants/:id/dashboard', authenticated, restController.getDashboard)
 router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/', (req, res) => res.redirect('/restaurants')) // 設定 fallback路由 如都匹配不到就會執行這行  如果想甚麼都沒匹配到然後導入/restaurants 把get 更改成 use
+
+router.post('/comments', authenticated, commentController.postComment)
 
 module.exports = router
