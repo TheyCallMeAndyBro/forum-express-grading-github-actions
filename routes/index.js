@@ -36,4 +36,7 @@ router.get('/', (req, res) => res.redirect('/restaurants')) // 設定 fallback�
 router.delete('/comments/:id', authenticated, commentController.deleteComment)
 router.post('/comments', authenticated, commentController.postComment)
 
+router.delete('/favorite/:restaurantId', authenticated, userController.removeFavorite)
+router.post('/favorite/:restaurantId', authenticated, userController.addFavorite)
+
 module.exports = router
