@@ -1,8 +1,8 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const bcrypt = require('bcryptjs')
-const db = require('../models')
-const User = db.User
+const { User, Restaurant } = require('../models')
+
 // set up Passport strategy
 passport.use(new LocalStrategy(
   // customize user field
@@ -25,12 +25,17 @@ passport.use(new LocalStrategy(
 ))
 // serialize and deserialize user
 passport.serializeUser((user, cb) => {
-  cb(null, user.id)
+  cb(null, user.id) // 我只回傳user.id進session
 })
 passport.deserializeUser((id, cb) => {
-  User.findByPk(id).then(user => {
-    user = user.toJSON()
-    return cb(null, user)
+  User.findByPk(id, {
+    include: [
+      { model: Restaurant, as: 'FavoritedRestaurants' }
+      // 會多出FavoritedRestaurants資料 裡面裝載被User加入最愛的Restaurant資料 及Favorite的object
+    ]
   })
+    .then(user => cb(null, user.toJSON()))
+    .catch(err => cb(err))
 })
+
 module.exports = passport
