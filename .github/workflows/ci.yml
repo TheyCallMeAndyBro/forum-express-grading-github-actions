@@ -1,16 +1,12 @@
 name: Node.js test
 
 on:
-  pull_request_target:
+  push:
     branches:
-      - main
-#  push:
-#    branches:
 #      - main
-#      - 'R*'
-#      - '*-test'
-#  pull_request:
-#    branches:
+      - '*-test'
+  pull_request:
+    branches:
 #      - main
 
 env:
