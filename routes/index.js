@@ -9,6 +9,7 @@ const commentController = require('../controllers/comment-controller')
 const { authenticated, authenticatedAdmin } = require('../middlewares/auth')
 
 const upload = require('../middlewares/multer')
+const { generalErrorHandler } = require('../middlewares/error-handler')
 
 router.use('/admin', authenticatedAdmin, admin) // 檢查admin權限
 
@@ -23,6 +24,7 @@ router.post('/signin', passport.authenticate('local', {
 
 router.get('/logout', userController.logout)
 
+router.get('/users/top', authenticated, userController.getTopUsers)
 router.get('/users/:id', authenticated, userController.getUser)
 router.get('/users/:id/edit', authenticated, userController.editUser)
 router.put('/users/:id', authenticated, upload.single('image'), userController.putUser)
@@ -42,4 +44,6 @@ router.post('/favorite/:restaurantId', authenticated, userController.addFavorite
 router.delete('/like/:restaurantId', authenticated, userController.removeLike)
 router.post('/like/:restaurantId', authenticated, userController.addLike)
 
+router.get('/', (req, res) => res.redirect('/restaurants'))
+router.use('/', generalErrorHandler)
 module.exports = router

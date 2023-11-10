@@ -44,9 +44,9 @@ const userController = {
   },
   getUser: (req, res, next) => {
     return User.findByPk(req.params.id, {
-      include: [{
-        model: Comment, include: Restaurant
-      }]
+      include: [
+        { model: Comment, include: Restaurant }
+      ]
     })
       .then(user => {
         if (!user) throw new Error('User did not exist!')
@@ -162,6 +162,20 @@ const userController = {
         return like.destroy()
       })
       .then(() => res.redirect('back'))
+      .catch(err => next(err))
+  },
+  getTopUsers: (req, res, next) => {
+    return User.findAll({
+      include: [{ model: User, as: 'Followers' }]
+    })
+      .then(users => {
+        users = users.map(user => ({
+          ...user.toJSON(),
+          followerCount: user.Followers.length, // 多加入追蹤者數量
+          isFollowed: req.user.Followings.some(f => f.id === user.id) // 現在登入者追蹤的人 是否已追蹤user物件中的人
+        }))
+        res.render('top-users', { users: users })
+      })
       .catch(err => next(err))
   }
 
