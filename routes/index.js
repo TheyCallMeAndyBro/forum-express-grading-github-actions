@@ -33,7 +33,6 @@ router.get('/restaurants', authenticated, restController.getRestaurants)
 router.get('/restaurants/feeds', authenticated, restController.getFeeds)
 router.get('/restaurants/:id/dashboard', authenticated, restController.getDashboard)
 router.get('/restaurants/:id', authenticated, restController.getRestaurant)
-router.get('/', (req, res) => res.redirect('/restaurants')) // 設定 fallback路由 如都匹配不到就會執行這行  如果想甚麼都沒匹配到然後導入/restaurants 把get 更改成 use
 
 router.delete('/comments/:id', authenticated, commentController.deleteComment)
 router.post('/comments', authenticated, commentController.postComment)
@@ -43,6 +42,9 @@ router.post('/favorite/:restaurantId', authenticated, userController.addFavorite
 
 router.delete('/like/:restaurantId', authenticated, userController.removeLike)
 router.post('/like/:restaurantId', authenticated, userController.addLike)
+
+router.delete('/following/:userId', authenticated, userController.removeFollowing)
+router.post('/following/:userId', authenticated, userController.addFollowing)
 
 router.get('/', (req, res) => res.redirect('/restaurants'))
 router.use('/', generalErrorHandler)
