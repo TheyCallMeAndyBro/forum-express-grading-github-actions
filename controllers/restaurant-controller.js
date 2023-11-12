@@ -1,5 +1,5 @@
 // 用物件的方式儲存
-const { Restaurant, Category, Comment, User } = require('../models')
+const { Restaurant, Category, Comment, User, Favorite } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helpers')
 
 const restaurantController = {
@@ -69,14 +69,18 @@ const restaurantController = {
       .catch(err => next(err))
   },
   getDashboard: (req, res, next) => {
-    return Restaurant.findByPk(req.params.id, {
-      include: Category,
-      raw: true,
-      nest: true
-    })
-      .then(restaurant => {
+    return Promise.all([
+      Restaurant.findByPk(req.params.id, {
+        include: [Category],
+        raw: true,
+        nest: true
+      }),
+      Comment.count({ where: { restaurantId: req.params.id } }),
+      Favorite.count({ where: { restaurantId: req.params.id } })
+    ])
+      .then(([restaurant, commentCount, favoriteCount]) => {
         if (!restaurant) throw new Error("Restaurant didn't exist!")
-        res.render('dashboard', { restaurant })
+        res.render('dashboard', { restaurant, commentCount, favoriteCount })
       })
       .catch(err => next(err))
   },
