@@ -61,9 +61,6 @@ const userController = {
         const userFollowers = user.Followers ? user.Followers : []
         const userFollowings = user.Followings ? user.Followings : []
 
-        // const followersIdPromise = Promise.all(userFollowers)
-        console.log('user:', userFollowers)
-        console.log('user:', userFollowings)
         res.render('users/profile', { user, userCommentRestaurant, userFavoritedRestaurant, userFollowers, userFollowings })
       })
       .catch(err => next(err))
