@@ -1,6 +1,6 @@
 // 用物件的方式儲存
-const { Restaurant, Category, Comment, User, Favorite } = require('../models')
-const { getOffset, getPagination } = require('../helpers/pagination-helpers')
+const { Restaurant, Category, Comment, User, Favorite } = require('../../models')
+const { getOffset, getPagination } = require('../../helpers/pagination-helpers')
 
 const restaurantController = {
   getRestaurants: (req, res) => {
