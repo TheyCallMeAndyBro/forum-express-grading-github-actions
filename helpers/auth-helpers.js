@@ -1,4 +1,4 @@
-module.exports = {
+const authHelpers = {
   getUser: req => {
     return req.user || null
   },
@@ -8,3 +8,5 @@ module.exports = {
   }
 
 }
+
+module.exports = authHelpers

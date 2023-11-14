@@ -114,7 +114,8 @@ const restaurantController = {
         const result = restaurants.map(r => ({
           ...r.toJSON(),
           favoritedCount: r.FavoritedUsers.length,
-          isFavorited: favoritedRestaurantsId.includes(r.id)
+          isFavorited: favoritedRestaurantsId?.includes(r.id)
+          // favoritedRestaurantsId 不存在 就不執行
         }))
           .sort((a, b) => b.favoritedCount - a.favoritedCount)
           .slice(0, 10)
