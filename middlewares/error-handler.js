@@ -11,3 +11,5 @@ module.exports = {
     next(error) // 繼續傳給Express預設的error-handler
   }
 }
+
+// 撰寫error.handler原因為 不要讓整個網站癱掉

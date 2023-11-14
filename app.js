@@ -6,7 +6,7 @@ const session = require('express-session')
 const methodOverride = require('method-override')
 const passport = require('./config/passport')
 
-const { pages } = require('./routes')
+const { pages, apis } = require('./routes')
 const { generalPartialsHandler } = require('./middlewares/partials-handler')
 const { generalErrorHandler } = require('./middlewares/error-handler')
 const handlebarsHelper = require('./helpers/handlebars-helpers')
@@ -30,7 +30,9 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(generalPartialsHandler)
 
+app.use('/api', apis) // 只有訪問到/api 這個路由才會使用apis這個middleware
 app.use(pages)
+
 app.use(generalErrorHandler)
 app.listen(port, () => {
   console.info(`Example app listening on port ${port}!`)
