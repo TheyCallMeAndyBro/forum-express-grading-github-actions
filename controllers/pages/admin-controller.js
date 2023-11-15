@@ -82,17 +82,9 @@ const adminController = {
       .catch(err => next(err))
   },
   deleteRestaurant: (req, res, next) => {
-    return Restaurant.findByPk(req.params.id)
-      .then(restaurant => {
-        if (!restaurant) throw new Error('Restaurant did not exist!')
-        // 也可用Restaurant.update寫法 裡面多添加where 就好
-        return restaurant.destroy()
-      })
-      .then(() => {
-        req.flash('success_messages', 'Delete successfully!')
-        res.redirect('/admin/restaurants')
-      })
-      .catch(err => next(err))
+    adminServices.getRestaurants(req, (err, data) => err
+      ? next(err)
+      : (req.flash('success_messages', 'Delete successfully!'), res.redirect('/admin/restaurants', data)))
   },
   getUsers: (req, res) => {
     return User.findAll({

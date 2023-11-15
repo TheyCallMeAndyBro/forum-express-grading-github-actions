@@ -9,6 +9,20 @@ module.exports = {
     res.redirect('back') // 'back'導回上一頁
 
     next(error) // 繼續傳給Express預設的error-handler
+  },
+  apiErrorHandler (err, req, res, next) {
+    if (err instanceof Error) {
+      res.status(err.status || 500).json({
+        status: 'error',
+        message: `${err.name}: ${err.message}`
+      })
+    } else {
+      res.status(500).json({
+        status: 'error',
+        message: `${err}`
+      })
+    }
+    next(err)
   }
 }
 
