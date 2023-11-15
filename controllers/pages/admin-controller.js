@@ -15,21 +15,12 @@ const adminController = {
       .catch(err => next(err))
   },
   postRestaurant: (req, res, next) => {
-    const { name, tel, address, openingHours, description, categoryId } = req.body
-    if (!name) throw new Error('Restaurant name is required !')
-
-    const { file } = req // 這邊要獲取的是req中file這個檔案 而req.body.file 獲取的是 name=file 輸入的字串
-
-    localFileHandler(file) // 傳入req獲取的file 有無檔案邏輯已在helpers內做完
-      .then(filePath => { // filePath為最後resolve的`/${fileName}`路徑字符串
-        return Restaurant.create({ name, tel, address, openingHours, description, image: filePath || null, categoryId })
-      })
-
-      .then(() => {
-        req.flash('success_messages', 'restaurant was successfully created') // 在畫面顯示成功提示
-        res.redirect('/admin/restaurants') // 新增完成後導回後台首頁
-      })
-      .catch(err => next(err))
+    adminServices.postRestaurant(req, (err, data) => {
+      if (err) return next(err)
+      req.flash('success_messages', 'restaurant was successfully created')
+      req.session.createdData = data
+      return res.redirect('/admin/restaurants')
+    })
   },
   getRestaurant: (req, res, next) => {
     return Restaurant.findByPk(req.params.id, {
@@ -82,9 +73,12 @@ const adminController = {
       .catch(err => next(err))
   },
   deleteRestaurant: (req, res, next) => {
-    adminServices.getRestaurants(req, (err, data) => err
-      ? next(err)
-      : (req.flash('success_messages', 'Delete successfully!'), res.redirect('/admin/restaurants', data)))
+    adminServices.deleteRestaurant(req, (err, data) => {
+      if (err) return next(err)
+      req.flash('success_messages', 'Delete successfully!')
+      req.session.deletedData = data
+      return res.redirect('/admin/restaurants')
+    })
   },
   getUsers: (req, res) => {
     return User.findAll({

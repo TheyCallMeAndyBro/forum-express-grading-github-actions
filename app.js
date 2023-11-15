@@ -21,6 +21,7 @@ app.set('view engine', 'hbs')
 app.set('views', './views')
 
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json()) // 讓如果今天不是用form表單 submit回傳資料  而是用js回傳資料時 可以讀取回傳的json物件
 app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }))
 app.use(flash()) // flash這種功能存在 session裡
 app.use(methodOverride('_method')) // _method為自定義
